@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.zensystem.zencashwallet" version="0.0.15" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>ZEN Wallet</name>
+<widget id="org.zeroclassic.zercwallet" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ZERC Wallet</name>
     <description>
-        ZEN Wallet
+        ZERC Wallet
     </description>
-    <author email="infrastructure@horizen.global" href="https://horizen.global">
-       Horizen Global 
+    <author email="miodragpopovic@stcable.net" href="https://zeroclassic.org">
+       Zero Classic 
     </author>
     <content src="index.html" />
     <access origin="*" />
@@ -32,15 +32,16 @@
     </feature>
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <hook src="./scripts/build.sh" type="before_prepare" />
-    <icon src="./assets/img/zencash.png" />
+    <icon src="./assets/img/zerc.png" />
     <allow-navigation href="http://*/*" />
     <allow-navigation href="https://*/*" />
     <allow-navigation href="data:*" />
     <access origin="*" />
     <allow-intent href="*" />
     <engine name="android" spec="^6.2.3" />
+    <engine name="browser" spec="^5.0.4" />
     <plugin name="cordova-plugin-file" spec="^4.3.3" />
-    <plugin name="cordova-plugin-qrscanner" spec="^2.6.1" />
+    <plugin name="cordova-plugin-qrscanner" spec="^2.6.2" />
     <plugin name="cordova-plugin-http" spec="^1.2.0" />
     <plugin name="cordova-clipboard" spec="^1.2.1" />
     <plugin name="cordova-plugin-inappbrowser" spec="^3.0.0" />

@@ -17,7 +17,7 @@ import {
   ListHeader
 } from 'react-onsenui'
 
-import zencashjs from 'zencashjs'
+import bitgo from 'bitgo-utxo-lib'
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -84,7 +84,7 @@ class SendPage extends React.Component {
     }
 
     this.handleQRScan = this.handleQRScan.bind(this)
-    this.handleSendZEN = this.handleSendZEN.bind(this)
+    this.handleSendZERC = this.handleSendZERC.bind(this)
     this.handleSendValueChange = this.handleSendValueChange.bind(this)
     this.handleSendCurrencyValueChange = this.handleSendCurrencyValueChange.bind(this)
     this.setProgressValue = this.setProgressValue.bind(this)
@@ -97,7 +97,7 @@ class SendPage extends React.Component {
   }
 
   // Handles conversion between
-  // zen and fiat and sets sendValue
+  // zerc and fiat and sets sendValue
   handleSendValueChange (e) {
     const str = e.target.value
     const sendVal = parseFloat(str)
@@ -193,7 +193,7 @@ class SendPage extends React.Component {
             alert(JSON.stringify(err))
           } else {
             // The scan completed, display the contents of the QR code
-            const scannedResultSeparated = address.split(/(?:horizen:|=|&|\?)+/)
+            const scannedResultSeparated = address.split(/(?:zerc:|=|&|\?)+/)
             const scannedAddress = scannedResultSeparated[1] || address
 
             this.setState({
@@ -222,7 +222,7 @@ class SendPage extends React.Component {
     }.bind(this))
   }
 
-  handleSendZEN () {
+  handleSendZERC () {
     // Language stuff
     const CUR_LANG = this.props.settings.language
 
@@ -236,10 +236,10 @@ class SendPage extends React.Component {
     const satoshisToSend = value * 100000000
     const satoshisfeesToSend = 10000 //set static fee of 0.0001
 
-    // Reset zen send progress
+    // Reset zerc send progress
     this.setProgressValue(1)
 
-    // Reset zen send progress
+    // Reset zerc send progress
     // Alert messages too
     var errString = ''
 
@@ -269,10 +269,7 @@ class SendPage extends React.Component {
       alert(errString)
       this.setProgressValue(0)
       return
-    }
-
-    // Private key
-    const senderPrivateKey = zencashjs.address.WIFToPrivKey(this.props.context.privateKey)
+    }	
 
     // Get previous transactions
     const prevTxURL = urlAppend(this.props.settings.insightAPI, 'addr/') + senderAddress + '/utxo'
@@ -300,7 +297,7 @@ class SendPage extends React.Component {
 
             const blockHeight = infoData.info.blocks - 300
             const blockHashURL = urlAppend(this.props.settings.insightAPI, 'block-index/') + blockHeight
-
+			
             // Get block hash
             axios.get(blockHashURL)
               .then((responseBhash) => {
@@ -318,6 +315,7 @@ class SendPage extends React.Component {
                   history = history.concat({
                     txid: txData[i].txid,
                     vout: txData[i].vout,
+                    satoshis: txData[i].satoshis,
                     scriptPubKey: txData[i].scriptPubKey
                   })
 
@@ -328,11 +326,11 @@ class SendPage extends React.Component {
                   }
      
                 }
-
+				
                 // If we don't have enough address
                 // fail and tell user
                 if (satoshisSoFar < satoshisToSend + satoshisfeesToSend) {
-                  alert(TRANSLATIONS[CUR_LANG].SendPage.notEnoughZEN)
+                  alert(TRANSLATIONS[CUR_LANG].SendPage.notEnoughZERC)
                   this.setProgressValue(0)
                   return
                 }
@@ -347,18 +345,37 @@ class SendPage extends React.Component {
                     recipients = recipients.concat({ address: senderAddress, satoshis: refundSatoshis })
                   }
                 }
+				
+				//Start building transaction - sapling epoch
+                let network = bitgo.networks['zerc'];
+                var keyPair = bitgo.ECPair.fromWIF(this.props.context.privateKey,network)
+                var txb = new bitgo.TransactionBuilder(network)
 
-                // Create transaction
-                var txObj = zencashjs.transaction.createRawTx(history, recipients, blockHeight, blockHash)
+                if (infoData.info.blocks  >= 501000) {
+                  txb.setVersion(bitgo.Transaction.ZCASH_SAPLING_VERSION)
+                  txb.setVersionGroupId(0x892F2085)
+                  txb.setExpiryHeight(infoData.info.blocks+300)
+                }
 
-                // Sign each history transcation
+				//add inputs
                 for (var j = 0; j < history.length; j++) {
-                  txObj = zencashjs.transaction.signTx(txObj, j, senderPrivateKey, true)
+                  txb.addInput(history[j].txid, history[j].vout)
+                }
+				
+                //add outputs
+                for (var k = 0; k < recipients.length; k++) {
+                  var outputScript = bitgo.address.toOutputScript(recipients[k].address,network)
+                  txb.addOutput(outputScript, recipients[k].satoshis)
+                }
+                
+                // Sign each history transcation
+                for (var l = 0; l < history.length; l++) {
+                  txb.sign(l,keyPair,'',bitgo.Transaction.SIGHASH_SINGLE,history[l].satoshis)
                 }
 
                 // Convert it to hex string
-                const txHexString = zencashjs.transaction.serializeTx(txObj)
-
+                const txHexString = txb.build().toHex()
+				
                 // Post it to the api
                 axios.post(sendRawTxURL,
                   {
@@ -383,17 +400,17 @@ class SendPage extends React.Component {
                     this.setProgressValue(0)
                   })
               }).catch((err) => {
-                alert('GET failure: ' + JSON.stringify(err))
+                alert('GET1 failure: ' + JSON.stringify(err))
 
                 this.setProgressValue(0)
               })
           }).catch((err) => {
-            alert('GET failure: ' + JSON.stringify(err))
+            alert('GET2 failure: ' + JSON.stringify(err))
 
             this.setProgressValue(0)
           })
       }).catch((err) => {
-        alert('GET failure: ' + JSON.stringify(err))
+        alert('GET3 failure: ' + JSON.stringify(err))
 
         this.setProgressValue(0)
       })
@@ -519,7 +536,7 @@ class SendPage extends React.Component {
                     <span style={{ fontSize: '12px', color: '#7f8c8d' }}>
                       {balanceLang}:&nbsp;
                       {this.props.context.value}&nbsp;
-                    ZEN
+                    ZERC
                     </span>
                     <Input
                       onChange={this.handleSendValueChange}
@@ -527,7 +544,7 @@ class SendPage extends React.Component {
                       placeholder={amountLang}
                       style={{ width: '100%' }}
                     /><br />
-                    ZEN
+                    ZERC
                   </ons-col>
                   <ons-col width={'10%'}>
                     <br />
@@ -588,7 +605,7 @@ class SendPage extends React.Component {
                   <ons-col width={'5%'}></ons-col>
                   <ons-col width={'47.5%'}>
                     <Button
-                      onClick={() => this.handleSendZEN()}
+                      onClick={() => this.handleSendZERC()}
                       disabled={!this.state.confirmSend || (this.state.progressValue > 0)}
                       style={{ width: '100%', height: '50px', paddingTop: '7px' }}>{sendLang}</Button>
                   </ons-col>

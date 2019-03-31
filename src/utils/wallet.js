@@ -1,6 +1,5 @@
-var bitcoinjs = require('bitcoinjs-lib')
+var bitgo = require('bitgo-utxo-lib')
 var bip32utils = require('bip32-utils')
-var zencashjs = require('zencashjs')
 
 // Hierarchical Deterministic wallet
 function phraseToSecretItems (phraseStr) {
@@ -8,10 +7,13 @@ function phraseToSecretItems (phraseStr) {
   // phraseStr: string
   const seedHex = Buffer.from(phraseStr.slice(0, 64)).toString('hex')
 
+  //Set Network
+  let network = bitgo.networks['zerc']
+  
   // chains
-  const hdNode = bitcoinjs.HDNode.fromSeedHex(seedHex)
+  const hdNode = bitgo.HDNode.fromSeedHex(seedHex, network)
   var chain = new bip32utils.Chain(hdNode)
-
+  
   // Creates 3 address from the same chain
   for (var k = 0; k < 2; k++) {
     chain.next()
@@ -22,14 +24,11 @@ function phraseToSecretItems (phraseStr) {
     // Get private key (WIF)
     const pkWIF = chain.derive(x).keyPair.toWIF()
 
-    // Private key
-    const privKey = zencashjs.address.WIFToPrivKey(pkWIF)
-
-    // Public key
-    const pubKey = zencashjs.address.privKeyToPubKey(privKey, true)
+    //Get keyPair
+    const keyPair = bitgo.ECPair.fromWIF(pkWIF, network)
 
     // Address
-    const address = zencashjs.address.pubKeyToAddr(pubKey)
+    const address = keyPair.getAddress()
 
     return {
       address,

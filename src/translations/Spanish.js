@@ -13,7 +13,7 @@ export const SPANISH_TRANSLATION: TRANSLATION_OBJ = {
     out: 'Salientes'
   },
   MainPage: {
-    title: 'Billetera ZEN',
+    title: 'Billetera ZERC',
     value: 'Valor',
     send: 'Enviar',
     received: 'Recibido',
@@ -25,7 +25,7 @@ export const SPANISH_TRANSLATION: TRANSLATION_OBJ = {
     copyToClipboard: 'Copiar Dirección al Portapapeles'
   },
   SendPage: {
-    title: 'Enviar un ZEN',
+    title: 'Enviar un ZERC',
     payTo: 'Pagar a',
     amountToPay: 'Monto a pagar',
     balance: 'Balance',
@@ -38,12 +38,12 @@ export const SPANISH_TRANSLATION: TRANSLATION_OBJ = {
     max: 'Máx',
     send: 'Enviar',
     txSuccessful: '¡Transacción exitosa! Haga clic aquí para ver su transacción.',
-    confirmSend: 'Quiero enviar estos ZEN',
+    confirmSend: 'Quiero enviar estos ZERC',
     invalidAddress: '`Dirigido a` inválido, sólo las direcciones transparentes son compatibles en este momento.',
     invalidAmount: '`Monto` Inválido.',
     invalidFee: '`Tarifas` Inválidas. Intente con 0 :)',
     zeroAmount: 'Monto debe ser mayor a 0.',
-    notEnoughZEN: 'No hay suficiente ZEN confirmado en la cuenta para realizar la transacción.',
+    notEnoughZERC: 'No hay suficiente ZERC confirmado en la cuenta para realizar la transacción.',
     noCameraPermissions: 'No hay permisos de cámara. Puede permitir el acceso de la cámara en su configuración.'
   },
   TxDetailPage: {
@@ -79,8 +79,8 @@ export const SPANISH_TRANSLATION: TRANSLATION_OBJ = {
   },
   PinPage: {
     changePinTitle: 'Cambiar PIN',
-    newPinPageTitle: 'Configuración de Billetera ZEN',
-    verifyPinPageTitle: 'Verificación PIN de Billetera ZEN',
+    newPinPageTitle: 'Configuración de Billetera ZERC',
+    verifyPinPageTitle: 'Verificación PIN de Billetera ZERC',
     setupNewPin: 'Configurar un nuevo PIN',
     reenterPin: 'Vuelva a introducir su PIN',
     pinsNotSimilar: 'Los PINs introducidos no coinciden',

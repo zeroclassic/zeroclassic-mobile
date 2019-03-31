@@ -30,8 +30,8 @@ import {
   setAddress,
   setPrivateKey,
   setAddressValue,
-  setZenInBtcValue,
-  setZenInCurrencyValue
+  setZercInBtcValue,
+  setZercInCurrencyValue
 } from '../actions/Context'
 import { LANG_ENGLISH } from '../actions/Settings'
 import { urlAppend, prettyFormatPrices } from '../utils/index'
@@ -80,14 +80,14 @@ const getTxDetailPage = (navigator, tx, curLang = LANG_ENGLISH) => {
           <ons-row>{tx.fees}</ons-row>
         </ListItem>
         <ListItem tappable>
-          <ons-row><strong>{ curTranslation.General.in }&nbsp;({tx.valueIn} ZEN)</strong></ons-row>
+          <ons-row><strong>{ curTranslation.General.in }&nbsp;({tx.valueIn} ZERC)</strong></ons-row>
           {
             tx.vin.map(function (vin, idx) {
               return (
                 <ons-row key={idx} style={{marginTop: '10px'}}>
                   <ons-col width={'90%'}>
                     { vin.addr }<br/>
-                    <span style={{color: '#7f8c8d'}}>({ vin.value } ZEN)</span>
+                    <span style={{color: '#7f8c8d'}}>({ vin.value } ZERC)</span>
                   </ons-col>
 
                   <ons-col width={'10%'}>
@@ -99,14 +99,14 @@ const getTxDetailPage = (navigator, tx, curLang = LANG_ENGLISH) => {
           }
         </ListItem>
         <ListItem tappable>
-          <ons-row><strong>{ curTranslation.General.out } ({tx.valueOut} ZEN)</strong></ons-row>
+          <ons-row><strong>{ curTranslation.General.out } ({tx.valueOut} ZERC)</strong></ons-row>
           {
             tx.vout.map(function (vout, idx) {
               return (
                 <ons-row key={idx} style={{marginTop: '10px'}}>
                   <ons-col width={'90%'}>
                     { vout.scriptPubKey.addresses[0] }<br/>
-                    <span style={{color: '#7f8c8d'}}>({ vout.value } ZEN)</span>
+                    <span style={{color: '#7f8c8d'}}>({ vout.value } ZERC)</span>
                   </ons-col>
 
                   <ons-col width={'10%'}>
@@ -162,10 +162,10 @@ class MainPage extends React.Component {
     // Resets
     this.setConnectionError(false)
     this.props.setAddressValue(null)
-    this.props.setZenInBtcValue(null)
-    this.props.setZenInCurrencyValue(null)
+    this.props.setZercInBtcValue(null)
+    this.props.setZercInCurrencyValue(null)
 
-    // How many zen
+    // How many zerc
     const addrURL = urlAppend(this.props.settings.insightAPI, 'addr/' + address + '/')
     axios.get(addrURL)
       .then((resp) => {
@@ -182,17 +182,18 @@ class MainPage extends React.Component {
 
         // Get btc value and get local currency
         // via coinmarketcap
+        // maybe one day in the future but not yet
         const curCurrency = this.props.settings.currency
-        const cmcZenInfoURL = 'https://api.coinmarketcap.com/v1/ticker/zencash/?convert=' + curCurrency
-        axios.get(cmcZenInfoURL)
+        const cmcZercInfoURL = 'https://api.coinmarketcap.com/v1/ticker/zencash/?convert=' + curCurrency
+        axios.get(cmcZercInfoURL)
           .then((resp) => {
             try {
               const coinmarketcapData = resp.data
               const priceBtc = parseFloat(coinmarketcapData[0]['price_btc'])
               const priceCurrency = parseFloat(coinmarketcapData[0]['price_' + curCurrency.toLowerCase()])
 
-              this.props.setZenInBtcValue(priceBtc)
-              this.props.setZenInCurrencyValue(priceCurrency)
+              this.props.setZercInBtcValue(priceBtc)
+              this.props.setZercInCurrencyValue(priceCurrency)
             } catch (err) {
               if (err) {
                 console.log(err)
@@ -220,7 +221,7 @@ class MainPage extends React.Component {
 
         this.setConnectionError(true)
       })
-
+		
     // Sets information about tx
     // When we set address info
     this.setAddressTxList(address, false)
@@ -356,7 +357,7 @@ class MainPage extends React.Component {
             onOpen={(e) => this.setState({ splitterOpen: true })}
             collapse={true}
             width={240}
-            isSwipeable={true}>
+            swipeable={true}>
             <Page>
               <List
                 dataSource=
@@ -374,7 +375,7 @@ class MainPage extends React.Component {
                       component: SettingsPage
                     }
                   ]}
-                renderHeader={() => <ListHeader>ZEN</ListHeader>}
+                renderHeader={() => <ListHeader>ZERC</ListHeader>}
                 renderRow={(i) =>
                   <ListItem
                     onClick={() => this.gotoComponent(i.component)}
@@ -406,10 +407,11 @@ class MainPage extends React.Component {
                     {
                       this.props.context.value === null
                         ? null
-                        : <span style={{fontSize: '16px'}}>ZEN</span>
+                        : <span style={{fontSize: '16px'}}>ZERC</span>
                     }
                   </h1>
                 </ons-col>
+                {/*
                 <ons-col>
                   <ons-row>
                     <ons-col>
@@ -440,6 +442,7 @@ class MainPage extends React.Component {
                     </ons-col>
                   </ons-row>
                 </ons-col>
+                */}
               </ons-row>
 
               <hr/>
@@ -513,7 +516,7 @@ class MainPage extends React.Component {
                                 <span style={{color: '#7f8c8d'}}>{ txTime }</span>
                               </ons-col>
                               <ons-col style={{textAlign: 'right', paddingRight: '12px'}}>
-                                { parseFloat(Math.abs(txValue)).toFixed(8) }&nbsp;ZEN
+                                { parseFloat(Math.abs(txValue)).toFixed(8) }&nbsp;ZERC
                               </ons-col>
                             </ons-row>
                           </ListItem>
@@ -568,8 +571,8 @@ MainPage.propTypes = {
   setAddress: PropTypes.func.isRequired,
   setAddressValue: PropTypes.func.isRequired,
   setPrivateKey: PropTypes.func.isRequired,
-  setZenInBtcValue: PropTypes.func.isRequired,
-  setZenInCurrencyValue: PropTypes.func.isRequired
+  setZercInBtcValue: PropTypes.func.isRequired,
+  setZercInCurrencyValue: PropTypes.func.isRequired
 }
 
 function mapStateToProps (state) {
@@ -587,8 +590,8 @@ function matchDispatchToProps (dispatch) {
       setAddress,
       setAddressValue,
       setPrivateKey,
-      setZenInBtcValue,
-      setZenInCurrencyValue
+      setZercInBtcValue,
+      setZercInCurrencyValue
     },
     dispatch
   )

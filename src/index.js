@@ -6,7 +6,7 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
-import createLogger from 'redux-logger'
+import { createLogger } from 'redux-logger'
 import { AppContainer } from 'react-hot-loader'
 
 import allReducers from './reducers'
@@ -17,7 +17,7 @@ import 'onsenui/css/onsenui.css'
 import 'onsenui/css/onsen-css-components.css'
 import '../assets/css/index.css'
 
-import { ZENCASH_MOBILE_SAVE_PATH, ZENCASH_MOBILE_CONTACTS_PATH, writeToFile } from './utils/persistentStorage'
+import { ZEROCLASSIC_MOBILE_SAVE_PATH, ZEROCLASSIC_MOBILE_CONTACTS_PATH, writeToFile } from './utils/persistentStorage'
 
 const logger = createLogger()
 
@@ -35,7 +35,7 @@ store.subscribe(() => {
   // Save secret phrase and settings
   if (state.secrets.secretPhrase !== null && state.settings.pin !== null) {
     // Write to file  
-    writeToFile(ZENCASH_MOBILE_SAVE_PATH, {
+    writeToFile(ZEROCLASSIC_MOBILE_SAVE_PATH, {
       secretPhrase: state.secrets.secretPhrase,
       settings: state.settings
     })
@@ -44,7 +44,7 @@ store.subscribe(() => {
   // Save contacts (different file)
   if (state.contacts.length > 0) {
     // Write to file
-    writeToFile(ZENCASH_MOBILE_CONTACTS_PATH, {
+    writeToFile(ZEROCLASSIC_MOBILE_CONTACTS_PATH, {
       contacts: state.contacts
     })
   }
